@@ -29,14 +29,31 @@ import sys
 ######################## ENC ####################################
 print "Current directory is ", os.getcwd()
 
-roi_str_gmt=sys.argv[1]
+study_area_shp=sys.argv[1]
 conv_grd_path=sys.argv[2]
 bs_dlist=sys.argv[3]
 
 print 'Downloading ENCs'
-enc_download_cmd='''fetches -R {} charts -p'''.format(roi_str_gmt)
+enc_download_cmd='''fetches -R {} charts:datatype=enc -p'''.format(study_area_shp)
 print enc_download_cmd
 os.system(enc_download_cmd)
+
+# new method
+os.chdir('charts')
+
+mllw2navd88_cmd="./vert_conv.sh " + conv_grd_path + "  navd88"
+os.system(mllw2navd88_cmd)
+
+print "Creating ENC Datalist"
+os.chdir('navd88')
+enc_datalist_cmd='./create_datalist.sh enc'
+os.system(enc_datalist_cmd)
+
+current_dir=os.getcwd()
+add_to_bmaster_cmd='echo ' + current_dir + '/charts.datalist -1 0.0001 >> ' + bs_dlist
+os.system(add_to_bmaster_cmd)
+
+
 
 ### OLD METHOD ###
 # old method, before using Matt's processing option
@@ -57,11 +74,10 @@ os.system(enc_download_cmd)
 # os.chdir('navd88')
 # enc_datalist_cmd='./create_datalist.sh enc'
 # os.system(enc_datalist_cmd)
+
+# current_dir=os.getcwd()
+# add_to_bmaster_cmd='echo ' + current_dir + '/charts.datalist -1 0.0001 >> ' + bs_dlist
+# os.system(add_to_bmaster_cmd)
 ### OLD METHOD ###
 
-# new method
-os.chdir('charts/ogr/xyz')
 
-current_dir=os.getcwd()
-add_to_bmaster_cmd='echo ' + current_dir + '/charts.datalist -1 0.0001 >> ' + bs_dlist
-os.system(add_to_bmaster_cmd)

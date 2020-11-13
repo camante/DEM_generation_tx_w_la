@@ -26,7 +26,7 @@ Date:
 import os
 import sys
 ######################## NOS ####################################
-roi_str_gmt=sys.argv[1]
+study_area_shp=sys.argv[1]
 conv_grd_path=sys.argv[2]
 bs_dlist=sys.argv[3]
 dem_dlist=sys.argv[4]
@@ -38,7 +38,7 @@ resamp_res=0.000030864199
 
 print "Current directory is ", os.getcwd()
 print 'Downloading NOS / BAG Surveys'
-nos_download_cmd='''fetches -R {} nos'''.format(roi_str_gmt)
+nos_download_cmd='''fetches -R {} nos'''.format(study_area_shp)
 print nos_download_cmd
 os.system(nos_download_cmd)
 

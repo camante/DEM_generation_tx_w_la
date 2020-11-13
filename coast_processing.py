@@ -44,7 +44,7 @@ print "Current Directory is ", dataset_dir
 
 #Additional Params:
 landsat_shp='/media/sf_C_win_lx/coastal_act/data/coast/landsat_all_NA.shp'
-mx_shp=main_dir+'/manual/data/coast/mx/cuerpo_agua_nad83_clip_edit.shp'
+
 #script removes disconnected rivers by only keep the largest poly (num_nhd_polys=1). 
 #If need large disconnected rivers,esp. on tile edges that got cut off, make value higher, e.g. num_nhd_polys=2.
 num_nhd_polys='1'
@@ -67,9 +67,9 @@ print "Copying Raster to burn clean NHD"
 cp_cmd3 = '''cp {}_tiles_buff.tif nhd/{}_nhd_clean.tif'''.format(basename,basename)
 os.system(cp_cmd3)
 
-print "Copying Raster to burn MX"
-cp_cmd4 = '''cp {}_tiles_buff.tif mx/{}_mx.tif'''.format(basename,basename)
-os.system(cp_cmd4)
+# print "Copying Raster to burn MX"
+# cp_cmd4 = '''cp {}_tiles_buff.tif mx/{}_mx.tif'''.format(basename,basename)
+# os.system(cp_cmd4)
 
 ########### LANDSAT ##################
 os.chdir('landsat')
@@ -200,19 +200,12 @@ os.system('''rm -rf gdb''')
 
 os.chdir('..')
 
-############ MX ##################
-os.chdir('mx')
 
-print "Rasterizing Shp"
-raster_shp_cmd3 = '''gdal_rasterize -tr {} {} -te {} -burn 1 -ot Int16 -co COMPRESS=DEFLATE {} {}_mx.tif'''.format(coast_res,coast_res,roi_str_ogr,mx_shp,basename)
-os.system(raster_shp_cmd3)
-
-os.chdir('..')
 ############ Combining Coastline Rasters ##################
 
 print "Combining Coastline Rasters"
 #add_rasts_cmd = '''gdal_calc.py -A nhd/{}_nhd_clean.tif -B landsat/{}_landsat.tif --outfile={}_coast_sum.tif --calc="A + B" --format=GTiff --overwrite'''.format(basename,basename,basename)
-add_rasts_cmd = '''gdal_calc.py -A nhd/{}_nhd_clean.tif -B landsat/{}_landsat.tif -C mx/{}_mx.tif --outfile={}_coast_sum.tif --calc="A + B + C" --format=GTiff --overwrite'''.format(basename,basename,basename,basename)
+add_rasts_cmd = '''gdal_calc.py -A nhd/{}_nhd_clean.tif -B landsat/{}_landsat.tif --outfile={}_coast_sum.tif --calc="A + B" --format=GTiff --overwrite'''.format(basename,basename,basename)
 #gdal_calc.py -A nhd/w_fl_nhd_clean_test.tif -B landsat/w_fl_landsat_test.tif --outfile=w_fl_coast_sum_test.tif --calc="A + B" --format=GTiff --overwrite
 os.system(add_rasts_cmd)
 

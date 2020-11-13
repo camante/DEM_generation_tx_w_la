@@ -44,7 +44,12 @@ then
 		echo "Converting to xyz:" $i
 		las2txt -i $(basename $i .laz)"_latlon.laz" -keep_class $class -o $(basename $i .laz)"_class_"$class.xyz -parse xyz
 		rm $(basename $i .laz)"_latlon.laz"
+		echo "Running blockmedian"
+		gmt blockmedian $(basename $i .laz)"_class_"$class.xyz -I0.1s $(gmt gmtinfo $(basename $i .laz)"_class_"$class.xyz -I-) -Q > $(basename $i .laz)"_class_"$class"_bm.xyz";
+		echo "Gzipping original xyz"
+		gzip $(basename $i .laz)"_class_"$class.xyz;
 		file_num=$((file_num + 1))
+		echo
 	done
 else
 	help

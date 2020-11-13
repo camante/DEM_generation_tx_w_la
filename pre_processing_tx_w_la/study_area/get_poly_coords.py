@@ -1,7 +1,7 @@
 # Import arcpy module
 import arcpy
 # Local variables:
-fcl = "E:\\COASTAL_Act\\camante\\s_tx\\data\\study_area\\s_tx_tiles.shp"
+fcl = "F:\\COASTAL_Act\\camante\\tx_w_la\\manual\\data\\study_area\\tx_w_la_tiles.shp"
 
 desc = arcpy.Describe(fcl)
 shapefieldname = desc.ShapeFieldName

@@ -2,14 +2,14 @@
 
 '''
 Description:
-Master Script to Generate DEMs for S TX. 
+Master Script to Generate DEMs for TX and West LA. 
 
 Author:
 Christopher Amante
 Christopher.Amante@colorado.edu
 
 Date:
-4/22/2020
+9/18/2020
 
 '''
 #################################################################
@@ -36,15 +36,14 @@ usace_dredge_process='no'
 mb_process='no'
 nos_process='no'
 enc_process='no'
-dc_lidar_process='no'
+dc_lidar_process='yes'
 tnm_lidar_process='no'
-mx_topo_process='no'
 ncei_dems_process='no'
 bathy_surf_process='no'
 dem_process='no'
 final_dem_format_process='no'
 #To Do
-spatial_meta_process='yes'
+spatial_meta_process='no'
 uncertainty_process='no'
 #################################################################
 #################################################################
@@ -54,11 +53,11 @@ uncertainty_process='no'
 #################################################################
 #################################################################
 #Project Area
-basename="s_tx"
+basename="tx_w_la"
 year=2020
 version=1
 #Main Directory Paths
-main_dir='/media/sf_E_win_lx/COASTAL_Act/camante/'+basename
+main_dir='/media/sf_F_win_lx/COASTAL_Act/camante/'+basename
 data_dir=main_dir+'/data'
 docs_dir=main_dir+'/docs'
 manual_dir=main_dir+'/manual'
@@ -74,7 +73,7 @@ bs_ind_dlist=data_dir+'/bathy/bathy_surf/xyz/bathy_surf.datalist'
 bs_tifs=data_dir+'/bathy/bathy_surf/tifs'
 coast_shp=data_dir+'/coast/'+basename+'_coast'
 #use files listed in existing mb1 files at datalist
-bs_mb1_var='yes'
+bs_mb1_var='no'
 #
 #DEM Gridding Variables
 manual_name_cell_extents_dem=manual_dir+'/software/gridding/'+basename+'_name_cell_extents_dem.csv'
@@ -84,7 +83,7 @@ name_cell_extents_dem_all=software_dir+'/gridding/tifs/smoothed/'+basename+'_nam
 dem_dlist=software_dir+'/gridding/'+basename+'_dem.datalist'
 dem_smooth_factor=5
 #use files listed in existing mb1 files at datalist
-dem_mb1_var='yes'
+dem_mb1_var='no'
 #
 #Spatial Metadata Datalist
 sm_dlist=manual_dir+'/software/gridding/'+basename+'_spatial_meta.datalist'
@@ -94,8 +93,8 @@ sm_res='0.3333333333s'
 #Conversion Grid Variables
 ivert='mllw'
 overt='navd88'
-conv_grd_name='cgrid_'+ivert+'2'+overt+'.tif'
-conv_grd_path=data_dir+'/conv_grd/'+conv_grd_name
+conv_grd_name='cgrid_'+ivert+'2'+overt
+conv_grd_path=data_dir+'/conv_grd/'+conv_grd_name+".tif"
 #
 #Manual Data Variables
 #
@@ -109,26 +108,20 @@ dc_lidar_csv=manual_dir+'/data/dc_lidar/dc_lidar_download_process.csv'
 tnm_lidar_man_path=manual_dir+'/data/topo/tnm_lidar/'
 tnm_lidar_csv=tnm_lidar_man_path+'tnm_lidar_download_process.csv'
 #
-#clip variables
-#located in manual_dir+'/data/topo/mx/
-mx_clip_shp='clip_mx_final'
 #################################################################
 ###################### REGION OF INTEREST #######################
 #################################################################
-west_buff=-98.05
-east_buff=-96.45
-south_buff=25.70
-north_buff=29.05
+west_buff=-96.55
+east_buff=-92.20
+south_buff=27.95
+north_buff=30.80
 roi_str_gmt=str(west_buff)+'/'+str(east_buff)+'/'+str(south_buff)+'/'+str(north_buff)
 roi_str_ogr=str(west_buff)+' '+str(south_buff)+' '+str(east_buff)+' '+str(north_buff)
 
-#test areas
+#print roi_str_gmt
+#roi_str_gmt='-96.55/-92.2/27.95/30.8'
 
-#E_04 tile test
-#E_04_1_9,0.00003086420,-97.25,-97.0,27.75,28.0
-#roi_str_gmt='-98.05/-96.45/25.7/29.05'
-#roi_str_ogr='-98.05 25.7 -96.45 29.05'
-
+#test areas here
 # west_buff=-97.3
 # east_buff=-96.95
 # south_buff=27.7
@@ -138,8 +131,9 @@ roi_str_ogr=str(west_buff)+' '+str(south_buff)+' '+str(east_buff)+' '+str(north_
 
 #study area with buffer
 study_area_shp=manual_dir+'/data/study_area/'+basename+'_tiles_buff.shp'
+
 #outer ring shp to get surrounding tiles data to ensure seamless across tiles 
-study_area_buff_outer_shp=manual_dir+'/data/study_area/'+basename+'_tiles_buff_outer.shp'
+#study_area_buff_outer_shp=manual_dir+'/data/study_area/'+basename+'_tiles_buff_outer.shp'
 #test out with 1 tile (E_04)
 #study_area_shp=manual_dir+'/data/study_area/'+basename+'_tiles_test_buff.shp'
 
@@ -255,7 +249,7 @@ if conv_grd_process=='yes':
 	os.system('cd')
 	os.chdir(data_dir+'/conv_grd')
 	print "Creating mllw2navd88 conversion grid"
-	conv_grd_cmd='waffles --verbose -R {} -E 1s -O {} vdatum:ivert=mllw:overt=navd88:region=3'.format(roi_str_gmt,conv_grd_name)
+	conv_grd_cmd='waffles -M vdatum:ivert=mllw:overt=navd88:region=3 -R {} -E 1s -P 4269 -O {} --verbose'.format(roi_str_gmt,conv_grd_name)
 	print conv_grd_cmd
 	os.system(conv_grd_cmd)
 else:
@@ -272,7 +266,7 @@ else:
 #################################################################
 ####################### STUDY AREA ##############################
 #################################################################
-#manually created shp in Global Mapper / ArcGIS (s_tx_tiles.shp) 
+#manually created shp in Global Mapper / ArcGIS (tx_w_la_tiles.shp) 
 #created name_cell_extents with arcpy get_poly_coords.py (name_cell_extents_bs.csv; name_cell_extents_DEM.csv) 
 #manually created study area buffer in ArcMap (s_tx_tiles_buff.shp)
 #manually created outer buffer to grab adjacent NCEI tiles DEMs (s_tx_tiles_buff_outer.shp) using arcmap erase(s_tx_tiles_buff.shp,s_tx_tiles.shp)
@@ -288,7 +282,6 @@ if coast_process=='yes':
 
 	####### CODE MANAGEMENT #########
 	os.system('mkdir -p landsat')
-	os.system('mkdir -p mx')
 	os.system('mkdir -p nhd')
 	os.system('mkdir -p nhd/zip')
 	os.system('mkdir -p nhd/gdb')
@@ -360,7 +353,7 @@ if usace_dredge_process=='yes':
 	os.system('cp {}/create_datalist.sh xyz/navd88/interp/create_datalist.sh'.format(code_dir)) 
 
 	print "executing usace_dredge_processing script"
-	os.system('./usace_dredge_processing.py {} {} {} {} {}'.format(roi_str_gmt, conv_grd_path, bs_dlist, dem_dlist, lastools_dir))
+	os.system('./usace_dredge_processing.py {} {} {} {} {}'.format(study_area_shp, conv_grd_path, bs_dlist, dem_dlist, lastools_dir))
 else:
 	print "Skipping USACE Dredge Processing"
 ######################### Multibeam #############################
@@ -389,7 +382,7 @@ if mb_process=='yes':
 	######## CODE MANAGEMENT #########
 	#sys.exit()
 	print "executing mb_processing script"
-	os.system('./mb_processing.py {} {}'.format(roi_str_gmt, bs_dlist))
+	os.system('./mb_processing.py {} {} {}'.format(study_area_shp, roi_str_gmt, bs_dlist))
 	####
 else:
 	print "Skipping MB Processing"
@@ -456,7 +449,7 @@ if nos_process=='yes':
 	os.system('cp {}/create_datalist.sh nos_bag/xyz/navd88/create_datalist.sh'.format(code_dir))
 
 	print "executing nos_processing script"
-	os.system('./nos_processing.py {} {} {} {}'.format(roi_str_gmt, conv_grd_path, bs_dlist, dem_dlist))
+	os.system('./nos_processing.py {} {} {} {}'.format(study_area_shp, conv_grd_path, bs_dlist, dem_dlist))
 else:
 	print "Skipping NOS Processing"
 # ########################## ENC ################################
@@ -466,37 +459,37 @@ if enc_process=='yes':
 	print 'Current Directory is', os.getcwd()
 
 	######### CODE MANAGEMENT #########
-	os.system('mkdir -p xyz')
-	os.system('mkdir -p xyz/neg')
-	os.system('mkdir -p xyz/neg/navd88')
+	os.system('mkdir -p charts')
+	os.system('mkdir -p charts/navd88')
+
 
 	#delete python script if it exists
 	os.system('[ -e enc_processing.py ] && rm enc_processing.py')
 	#copy python script from DEM_generation code
 	os.system('cp {}/enc_processing.py enc_processing.py'.format(code_dir)) 
 
-	#delete shell script if it exists
-	os.system('[ -e xyz/pos2neg.sh ] && rm xyz/pos2neg.sh')
-	#copy sh script from DEM_generation code
-	os.system('cp {}/pos2neg.sh xyz/pos2neg.sh'.format(code_dir))
+	# #delete shell script if it exists
+	# os.system('[ -e xyz/pos2neg.sh ] && rm xyz/pos2neg.sh')
+	# #copy sh script from DEM_generation code
+	# os.system('cp {}/pos2neg.sh xyz/pos2neg.sh'.format(code_dir))
 
 	#delete shell script if it exists
-	os.system('[ -e xyz/neg/vert_conv.sh ] && rm xyz/neg/vert_conv.sh')
+	os.system('[ -e charts/vert_conv.sh ] && rm charts/vert_conv.sh')
 	#copy sh script from DEM_generation code
-	os.system('cp {}/vert_conv.sh xyz/neg/vert_conv.sh'.format(code_dir))
+	os.system('cp {}/vert_conv.sh charts/vert_conv.sh'.format(code_dir))
 
 	#delete shell script if it exists
-	os.system('[ -e xyz/neg/gdal_query.py ] && rm xyz/neg/gdal_query.py')
+	os.system('[ -e charts/gdal_query.py ] && rm charts/gdal_query.py')
 	#copy sh script from DEM_generation code
-	os.system('cp {}/gdal_query.py xyz/neg/gdal_query.py'.format(code_dir))
+	os.system('cp {}/gdal_query.py charts/gdal_query.py'.format(code_dir))
 
 	#delete shell script if it exists
-	os.system('[ -e xyz/neg/navd88/create_datalist.sh ] && rm xyz/neg/navd88/create_datalist.sh')
+	os.system('[ -e charts/navd88/create_datalist.sh ] && rm charts/navd88/create_datalist.sh')
 	#copy sh script from DEM_generation code
-	os.system('cp {}/create_datalist.sh xyz/neg/navd88/create_datalist.sh'.format(code_dir))
+	os.system('cp {}/create_datalist.sh charts/navd88/create_datalist.sh'.format(code_dir))
 
 	print "executing enc_processing script"
-	os.system('./enc_processing.py {} {} {}'.format(roi_str_gmt, conv_grd_path, bs_dlist))
+	os.system('./enc_processing.py {} {} {}'.format(study_area_shp, conv_grd_path, bs_dlist))
 else:
 	print "Skipping ENC Processing"
 #############################################################
@@ -568,33 +561,6 @@ if tnm_lidar_process=='yes':
 	####
 else:
 	print "Skipping TNM Lidar Processing"
-
-#############################################################
-################## MX TOPO ##################################
-#############################################################
-if mx_topo_process=='yes':
-	os.system('cd')
-	os.chdir(manual_dir+'/data/topo/mx')
-	print 'Current Directory is', os.getcwd()
-	
-	######### CODE MANAGEMENT #########
-	os.system('mkdir -p xyz')
-
-	#delete shell script if it exists
-	os.system('[ -e mx_topo_processing.sh ] && rm mx_topo_processing.sh')
-	#copy shell script from DEM_generation code
-	os.system('cp {}/mx_topo_processing.sh mx_topo_processing.sh'.format(code_dir))
-
-	#delete shell script if it exists
-	os.system('[ -e xyz/create_datalist.sh ] && rm xyz/create_datalist.sh')
-	#copy sh script from DEM_generation code
-	os.system('cp {}/create_datalist.sh xyz/create_datalist.sh'.format(code_dir)) 
-
-	print "executing mc_topo_processing script"
-	os.system('./mx_topo_processing.sh {} {}'.format(mx_clip_shp, dem_dlist))
-	####
-else:
-	print "Skipping MX Topo Processing"
 
 #############################################################
 ################## NCEI DEMS ################################

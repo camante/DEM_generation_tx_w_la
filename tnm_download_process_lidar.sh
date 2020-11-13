@@ -56,13 +56,18 @@ fi
 
 cd $data_name
 
-echo "Getting list of laz files in shp"
-fetches -R $data_shp tnm:ds=4:formats=LAZ:extents:LAZ -l > $data_name"_all.txt"
 
-echo "Filtering list of laz files to dataset of interest"
-grep -hr "$filter_string" $data_name"_all.txt" > xyz/"tnm_lidar_"$data_name".csv"
+####
+#DID BELOW MANUALLY WITH tnm_lidar_query.sh with entire study area shp
+#echo "Getting list of laz files in shp"
+#fetches -R $data_shp tnm:ds=4:formats=LAZ:extents:LAZ -l > $data_name"_all.txt"
+
+#echo "Filtering list of laz files to dataset of interest"
+#grep -hr "$filter_string" $data_name"_all.txt" > xyz/"tnm_lidar_"$data_name".csv"
 #mv "tnm_lidar_"$data_name".csv" xyz/"tnm_lidar_"$data_name".csv"
+####
 
+cp $tnm_lidar_man_path"tnm_lidar_"$data_name".csv" xyz/"tnm_lidar_"$data_name".csv"
 cd xyz
 
 echo "Downloading Data"

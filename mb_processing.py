@@ -23,14 +23,15 @@ Date:
 import os
 import sys
 ######################## MB ###########################
-roi_str_gmt=sys.argv[1]
-bs_dlist=sys.argv[2]
+study_area_shp=sys.argv[1]
+roi_str_gmt=sys.argv[2]
+bs_dlist=sys.argv[3]
 #other params
 #1 arc-sec
 #bm_cell=0.00027777777
 #1/3 arc-sec res
 bm_cell=0.000092592596
-min_val=-125
+min_val=-60
 max_val= 0
 
 print "Current directory is ", os.getcwd()
