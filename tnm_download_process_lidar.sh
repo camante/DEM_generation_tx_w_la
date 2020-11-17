@@ -71,7 +71,7 @@ cp $tnm_lidar_man_path"tnm_lidar_"$data_name".csv" xyz/"tnm_lidar_"$data_name".c
 cd xyz
 
 echo "Downloading Data"
-wget -c -nc --input-file "tnm_lidar_"$data_name".csv"
+wget -N --input-file "tnm_lidar_"$data_name".csv"
 
 echo "Converting laz to xyz for class", $first_class
 ./laz2xyz_repro_latlon_m.sh $first_class

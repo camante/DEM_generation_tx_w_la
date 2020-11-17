@@ -80,9 +80,9 @@ mv $dir_name"_"clip_index_url.csv xyz/$dir_name"_"clip_index_url.csv
 cd xyz
 
 echo "Downloading Data"
-wget -c -nc --input-file $dir_name"_"clip_index_url.csv
+wget -N --input-file $dir_name"_"clip_index_url.csv
 
-echo "Converting laz to xyz for class", $first_class
+echo "Converting laz to xyz for class" $first_class
 ./laz2xyz.sh $first_class
 
 if [ -z "$second_class" ]
@@ -93,6 +93,7 @@ then
 	#rm *.laz
 else
 	echo "LAZ has valid second class"
+	echo "Converting laz to xyz for class" $second_class
 	./laz2xyz.sh $second_class
 	echo "Separating Pos and Neg"
 	./separate_pos_neg.sh

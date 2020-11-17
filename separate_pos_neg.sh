@@ -35,9 +35,9 @@ echo "File name is " $i
 echo -- Separating into positive and negative values
 awk $param -v neg="neg/$(basename $i .xyz)_neg.xyz" -v pos="pos/$(basename $i .xyz)_pos.xyz" '{if($3<=0)print > neg;else print > pos}' $i
 
-mv $i $i.xyc
+mv $i $(basename $i .xyz)".xyc"
 
 file_num=$((file_num + 1))
 done
 
-rm *.xyc
+#rm *.xyc
