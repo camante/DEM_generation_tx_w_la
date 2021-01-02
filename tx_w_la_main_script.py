@@ -40,9 +40,8 @@ dc_lidar_process='no'
 tnm_lidar_process='no'
 ncei_dems_process='no'
 bathy_surf_process='yes'
-dem_process='no'
+dem_process='yes'
 final_dem_format_process='no'
-#To Do
 spatial_meta_process='no'
 uncertainty_process='no'
 #################################################################

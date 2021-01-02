@@ -4,6 +4,7 @@ smooth_factor=$2
 year=$3
 version=$4
 border_dems_path=$5
+existing_tiles=$6
 
 #finest cell size resolution, e.g., 1/9th arc-sec, provided in gdalinfo
 fine_cell=0.000030864197534
@@ -167,6 +168,9 @@ echo "Completing Final Formating of DEM"
 gdal_translate $name"_final_tmp.tif" -of GTiff -a_srs EPSG:4269 -a_nodata -999999 -mo TIFFTAG_COPYRIGHT="DOC/NOAA/NESDIS/NCEI > National Centers for Environmental Information, NESDIS, NOAA, U.S. Department of Commerce" -mo TIFFTAG_IMAGEDESCRIPTION="Topography-Bathymetry; NAVD88" -mo TIFFTAG_DATETIME=$date -co TILED=YES -co COMPRESS=DEFLATE -co PREDICTOR=3 "deliverables/ncei"$cell_name"_n"$north_degree"X"$north_decimal"_w0"$west_degree"X"$west_decimal"_"$year"v"$version".tif" -stats
 rm $name"_final_tmp.tif"
 rm $name"_final_tmp.tif.aux.xml"
+
+echo "Checking for existing tiles"
+./update_tile_version.sh $existing_tiles
 
 echo "Converting to NetCDF for thredds"
 #below method causes half cell shift in global mapper but not in arcgis

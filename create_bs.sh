@@ -145,7 +145,8 @@ if [ ${#@} == 4 ];
 
 	#Create Topo Guide for 1/9th Arc-Sec Topobathy DEMs
 	#This adds in values of -0.1 to constain interpolation in inland areas without data.
-	if [[ "$target_res" = 0.00003086420 ]]
+	#if [[ "$target_res" = 0.00003086420 ]]
+	if [[ "$target_res" = 0.00003086420 && ! -e "topo_guide/"$name"_tguide.xyz" ]]
 		then 
 		echo -- Creating Topo Guide...
 		#Add on 6 more cells just to make sure there is no edge effects when burnining in shp.
@@ -162,8 +163,13 @@ if [ ${#@} == 4 ];
 		echo -- Converting to CSV
 		ogr2ogr -f CSV -dialect sqlite -sql "select AsGeoJSON(geometry) AS geom, * from tmp" tmp.csv tmp.shp
 		echo -- Formatting XYZ
-		sed 's/],/\n/g' tmp.csv | sed 's|[[]||g' | sed 's|[]]||g' | sed 's/}","0"//g' | sed 's/geom,DN//g' | sed 's/"{""type"":""Polygon"",""coordinates""://g' | sed '/^$/d' | sed 's/$/,-0.1/' > topo_guide/$name"_tguide.xyz"
+		#original
+		#sed 's/],/\n/g' tmp.csv | sed 's|[[]||g' | sed 's|[]]||g' | sed 's/}","0"//g' | sed 's/geom,DN//g' | sed 's/"{""type"":""Polygon"",""coordinates""://g' | sed '/^$/d' | sed 's/$/,-0.1/' > topo_guide/$name"_tguide.xyz"
+		#after editing coastline shp, above no longer worked.
+		#editted below to work with edited coastline shp
+		sed 's/],/\n/g' tmp.csv | sed 's|[[]||g' | sed 's|[]]||g' | sed 's/}","0"//g' | sed 's/geom,DN//g' | sed 's/"{""type"":""Polygon"",""coordinates""://g' | sed '/^$/d' | sed 's/$/,-0.1/' | awk -F, '{print $1,$2,$4}' | awk '{if (NR!=1) {print}}' > topo_guide/$name"_tguide.xyz"
 		
+
 		rm tmp.shp
 		rm tmp.dbf
 		rm tmp.prj
