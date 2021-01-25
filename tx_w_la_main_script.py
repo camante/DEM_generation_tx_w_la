@@ -53,7 +53,7 @@ uncertainty_process='no'
 #################################################################
 #Project Area
 basename="tx_w_la"
-year=2020
+year=2021
 version=1
 #Main Directory Paths
 main_dir='/media/sf_F_win_lx/COASTAL_Act/camante/'+basename
@@ -667,6 +667,11 @@ if final_dem_format_process=='yes':
 	os.system('[ -e final_dem_format.sh ] && rm final_dem_format.sh')
 	#copy shell script from DEM_generation code
 	os.system('cp {}/final_dem_format.sh final_dem_format.sh'.format(code_dir))
+
+	#delete shell script if it exists
+	os.system('[ -e update_tile_version.sh ] && rm update_tile_version.sh')
+	#copy shell script from DEM_generation code
+	os.system('cp {}/update_tile_version.sh update_tile_version.sh'.format(code_dir))
 
 	#delete py script if it exists
 	os.system('[ -e resample.py ] && rm resample.py')

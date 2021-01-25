@@ -170,12 +170,15 @@ rm $name"_final_tmp.tif"
 rm $name"_final_tmp.tif.aux.xml"
 
 echo "Checking for existing tiles"
-./update_tile_version.sh $existing_tiles
+input_tile="deliverables/ncei"$cell_name"_n"$north_degree"X"$north_decimal"_w0"$west_degree"X"$west_decimal"_"$year"v"$version".tif"
+./update_tile_version.sh $input_tile $year
 
-echo "Converting to NetCDF for thredds"
+#Added below code to update_tile_version.sh
+#
+#echo "Converting to NetCDF for thredds"
 #below method causes half cell shift in global mapper but not in arcgis
 #when converted to xyz, it appears in right place in global mapper
-gmt grdconvert "deliverables/ncei"$cell_name"_n"$north_degree"X"$north_decimal"_w0"$west_degree"X"$west_decimal"_"$year"v"$version".tif" "deliverables/thredds/ncei"$cell_name"_n"$north_degree"X"$north_decimal"_w0"$west_degree"X"$west_decimal"_"$year"v"$version".nc" -fg -V
+#gmt grdconvert "deliverables/ncei"$cell_name"_n"$north_degree"X"$north_decimal"_w0"$west_degree"X"$west_decimal"_"$year"v"$version".tif" "deliverables/thredds/ncei"$cell_name"_n"$north_degree"X"$north_decimal"_w0"$west_degree"X"$west_decimal"_"$year"v"$version".nc" -fg -V
 
 echo "Removing Clipped tifs"
 sed 1d $name"_dem_list.txt" |
