@@ -2,10 +2,12 @@
 function help () {
 echo "download_mb_roi.sh - A script that downloads mb data in chunks from a WESN ROI, runs blockmedian, and then converts to xyz."
     echo "Usage: $0 name_cell_extents cellsize"
-    echo "* name_cell_extents: <csv with names, cellsize, and extents>"
-    echo "* cellsize: <blockmedian cell size in arc-seconds>
+    echo "* roi_str_gmt in W/E/S/N format"
+    echo "* bm_cell: <blockmedian cell size in arc-seconds>
     0.000092592596 = 1/3rd arc-second
     0.00027777777 = 1 arc-second"
+    echo "* min_val = min depth, exclude depths deeper than this value, e.g., -11000"
+    echo "* max_val = max depth, exclude depths shallower than this value, e.g., 0"
 }
 
 
@@ -33,7 +35,9 @@ for i in *.fbt;
 do
 	echo "Working on file" $i
 	echo "Converting to XYZ"
-	mblist -MX20 -OXYZ -I$i -R$roi_str_gmt | awk -v min_val="$min_val" -v max_val="$max_val" '{if ($3 > min_val && $3 < max_val) {printf "%.8f %.8f %.3f\n", $1,$2,$3}}' > $(basename $i .fbt)".xyz"
+	#-MX parameter to remove 20% of outer beams
+	#mblist -MX20 -OXYZ -I$i -R$roi_str_gmt | awk -v min_val="$min_val" -v max_val="$max_val" '{if ($3 > min_val && $3 < max_val) {printf "%.8f %.8f %.3f\n", $1,$2,$3}}' > $(basename $i .fbt)".xyz"
+	mblist -OXYZ -I$i -R$roi_str_gmt | awk -v min_val="$min_val" -v max_val="$max_val" '{if ($3 > min_val && $3 < max_val) {printf "%.8f %.8f %.3f\n", $1,$2,$3}}' > $(basename $i .fbt)".xyz"
 	echo "Running blockmedian"
 	gmt blockmedian $(basename $i .fbt)".xyz" -I$bm_cell/$bm_cell -R$roi_str_gmt -V -Q > $(basename $i .fbt)"_bm_tmp.xyz"
 	awk '{printf "%.8f %.8f %.2f\n", $1,$2,$3}' $(basename $i .fbt)"_bm_tmp.xyz" > xyz/$(basename $i .fbt)"_bm.xyz"

@@ -39,10 +39,10 @@ enc_process='no'
 dc_lidar_process='no'
 tnm_lidar_process='no'
 ncei_dems_process='no'
-bathy_surf_process='yes'
-dem_process='yes'
+bathy_surf_process='no'
+dem_process='no'
 final_dem_format_process='no'
-spatial_meta_process='no'
+spatial_meta_process='yes'
 uncertainty_process='no'
 #################################################################
 #################################################################
@@ -705,9 +705,13 @@ if spatial_meta_process=='yes':
 	######### CODE MANAGEMENT #########
 	#delete shell script if it exists
 	os.system('[ -e create_spatial_meta.sh ] && rm create_spatial_meta.sh')
-
 	#copy shell script from DEM_generation code
 	os.system('cp {}/create_spatial_meta.sh create_spatial_meta.sh'.format(code_dir))
+
+	#delete shell script if it exists
+	os.system('[ -e update_tile_version_sm.sh ] && rm update_tile_version_sm.sh')
+	#copy shell script from DEM_generation code
+	os.system('cp {}/update_tile_version_sm.sh update_tile_version_sm.sh'.format(code_dir))
 
 	print "executing create_spatial_meta.sh script"
 	os.system('./create_spatial_meta.sh {} {} {} {} {}'.format(name_cell_extents_sm,sm_dlist,sm_res,year,version))

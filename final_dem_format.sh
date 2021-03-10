@@ -4,7 +4,6 @@ smooth_factor=$2
 year=$3
 version=$4
 border_dems_path=$5
-existing_tiles=$6
 
 #finest cell size resolution, e.g., 1/9th arc-sec, provided in gdalinfo
 fine_cell=0.000030864197534

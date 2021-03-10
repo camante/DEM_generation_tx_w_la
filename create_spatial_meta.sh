@@ -126,30 +126,34 @@ if [ "$cellsize_degrees" = 0.00003086420 ]
 then
 	cell_name=19
 	#cellsize_degrees=0.1111111111s
-	extend=2
+	extend=2:0
 elif [ "$cellsize_degrees" = 0.00009259259 ]
 then
 	cell_name=13
 	#cellsize_degrees=0.3333333333s
-	extend=6
+	extend=6:0
 else
 	cell_name=unknown_cellsize
-	extend=0
+	extend=0:0
 fi
 
 #test
+#extend=
 
 echo "Starting Spatial Metadata Generation"
 output_name="ncei"$cell_name"_n"$north_degree"X"$north_decimal"_w0"$west_degree"X"$west_decimal"_"$year"v"$version
 echo "Output name is:"$output_name
-echo "Command is: waffles -R $range -E $sm_res -V -O $output_name -M datalists -s $datalist -P 4269 -X $extend"
+echo "Command is: waffles -R $range -E $sm_res -V -O $output_name -M spat-meta -s $datalist -P 4269 -X $extend"
 
-waffles -R $range -E $sm_res -V -O $output_name -M datalists -s $datalist -P 4269 -X $extend
+waffles -R $range -E $sm_res -V -O $output_name -M spat-meta -s $datalist -P 4269 -X $extend
 
 echo
 echo "Command used: waffles -R $range -E $sm_res -V -O $output_name -M datalists -s $datalist -P 4269 -X $extend"
 echo
 echo "Completed Spatial Metadata for " $output_name
+
+echo "Checking for existing tiles"
+./update_tile_version_sm.sh $output_name $year
 
 done
 

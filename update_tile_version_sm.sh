@@ -1,7 +1,7 @@
 input_tile=$1
 year=$2
 existing_tiles=all_dc_tiles.csv
-touch replace_files.csv
+touch replace_files_sm.csv
 
 #create all_dc_tiles.csv if it doesn't already exist
 if test -f "$existing_tiles"; then
@@ -45,6 +45,8 @@ echo "Input tile is" $input_tile
 input_tile_base=${input_tile%_*}
 echo "Input tile base is" $input_tile_base
 
+
+
 echo "Searching for" $input_tile_base "in" $existing_tiles
 search_result=$(grep -iF "$input_tile_base" $existing_tiles)
 
@@ -56,7 +58,7 @@ then
 else
 	echo "Previous version found"
 	#add to csv
-	echo $input_tile >> replace_files.csv
+	echo $input_tile >> replace_files_sm.csv
 
 	version=$(echo "$search_result" | sed -e 's/\(^.*v\)\(.*\)\(.tif.*$\)/\2/')
 	echo "Version is" $version
@@ -70,12 +72,9 @@ else
 	new_extension=${year}"v"${update_version}
 	echo "New extension is" $new_extension
 
-	echo "Renaming tif to new version name" $input_tile_base"_"$new_extension".tif"
-	mv $input_tile $input_tile_base"_"$new_extension".tif"
-
-	echo "Converting to NetCDF for thredds"
-	#below method causes half cell shift in global mapper but not in arcgis
-	#when converted to xyz, it appears in right place in global mapper
-	gmt grdconvert "deliverables/"$input_tile_base"_"$new_extension".tif" "deliverables/thredds/"$input_tile_base"_"$new_extension".nc" -fg -V
-
+	echo "Renaming shp to new version name" $input_tile_base"_"$new_extension"_sm.shp"
+	mv $input_tile"_sm.shp" $input_tile_base"_"$new_extension"_sm.shp"
+	mv $input_tile"_sm.dbf" $input_tile_base"_"$new_extension"_sm.dbf"
+	mv $input_tile"_sm.shx" $input_tile_base"_"$new_extension"_sm.shx"
+	mv $input_tile"_sm.prj" $input_tile_base"_"$new_extension"_sm.prj"
 fi

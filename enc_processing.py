@@ -50,7 +50,7 @@ enc_datalist_cmd='./create_datalist.sh enc'
 os.system(enc_datalist_cmd)
 
 current_dir=os.getcwd()
-add_to_bmaster_cmd='echo ' + current_dir + '/charts.datalist -1 0.0001 >> ' + bs_dlist
+add_to_bmaster_cmd='echo ' + current_dir + '/enc.datalist -1 0.0001 >> ' + bs_dlist
 os.system(add_to_bmaster_cmd)
 
 
@@ -76,7 +76,7 @@ os.system(add_to_bmaster_cmd)
 # os.system(enc_datalist_cmd)
 
 # current_dir=os.getcwd()
-# add_to_bmaster_cmd='echo ' + current_dir + '/charts.datalist -1 0.0001 >> ' + bs_dlist
+# add_to_bmaster_cmd='echo ' + current_dir + '/enc.datalist -1 0.0001 >> ' + bs_dlist
 # os.system(add_to_bmaster_cmd)
 ### OLD METHOD ###
 
