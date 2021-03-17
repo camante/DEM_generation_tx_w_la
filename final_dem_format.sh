@@ -44,6 +44,14 @@ do
 		#if at finest res, don't need to keep zero raster
 		[ -f $(basename $i .tif)"_zero.tif"  ] && rm $(basename $i .tif)"_zero.tif" 
 	else
+		#Calculate zero grid if it doesn't exist
+		echo "Processing" $i
+		if [ -f $(basename $i .tif)"_zero.tif" ]; then
+			echo "Zero grid already exists, skipping generation..."
+		else
+			echo "Generating zero grid"
+			gdal_calc.py -A $i --outfile=$(basename $i .tif)"_zero.tif"  --calc="A*0"
+		fi
 		echo "Resampling to the finest resolution to use in mosaic"
 		gdalwarp $(basename $i .tif)"_zero.tif" -tr $fine_cell $fine_cell $(basename $i .tif)"_zero_ninth.tif" -overwrite
 		resamp_factor_flt=$(echo "$raster_cellsize / $fine_cell" | bc -l)
@@ -164,12 +172,12 @@ echo "Converting DEM to target cell size"
 gdalwarp -dstnodata -999999 -tr $cellsize_degrees $cellsize_degrees $name"_mosaic.tif" $name"_final_tmp.tif"
 
 echo "Completing Final Formating of DEM"
-gdal_translate $name"_final_tmp.tif" -of GTiff -a_srs EPSG:4269 -a_nodata -999999 -mo TIFFTAG_COPYRIGHT="DOC/NOAA/NESDIS/NCEI > National Centers for Environmental Information, NESDIS, NOAA, U.S. Department of Commerce" -mo TIFFTAG_IMAGEDESCRIPTION="Topography-Bathymetry; NAVD88" -mo TIFFTAG_DATETIME=$date -co TILED=YES -co COMPRESS=DEFLATE -co PREDICTOR=3 "deliverables/ncei"$cell_name"_n"$north_degree"X"$north_decimal"_w0"$west_degree"X"$west_decimal"_"$year"v"$version".tif" -stats
+gdal_translate $name"_final_tmp.tif" -of GTiff -a_srs EPSG:4269 -a_nodata -999999 -mo TIFFTAG_COPYRIGHT="DOC/NOAA/NESDIS/NCEI > National Centers for Environmental Information, NESDIS, NOAA, U.S. Department of Commerce" -mo TIFFTAG_IMAGEDESCRIPTION="Topography-Bathymetry; NAVD88" -mo TIFFTAG_DATETIME=$date -co TILED=YES -co COMPRESS=DEFLATE -co PREDICTOR=3 "deliverables/ncei"$cell_name"_n"$north_degree"x"$north_decimal"_w0"$west_degree"x"$west_decimal"_"$year"v"$version".tif" -stats
 rm $name"_final_tmp.tif"
 rm $name"_final_tmp.tif.aux.xml"
 
 echo "Checking for existing tiles"
-input_tile="deliverables/ncei"$cell_name"_n"$north_degree"X"$north_decimal"_w0"$west_degree"X"$west_decimal"_"$year"v"$version".tif"
+input_tile="ncei"$cell_name"_n"$north_degree"x"$north_decimal"_w0"$west_degree"x"$west_decimal"_"$year"v"$version".tif"
 ./update_tile_version.sh $input_tile $year
 
 #Added below code to update_tile_version.sh
@@ -177,7 +185,7 @@ input_tile="deliverables/ncei"$cell_name"_n"$north_degree"X"$north_decimal"_w0"$
 #echo "Converting to NetCDF for thredds"
 #below method causes half cell shift in global mapper but not in arcgis
 #when converted to xyz, it appears in right place in global mapper
-#gmt grdconvert "deliverables/ncei"$cell_name"_n"$north_degree"X"$north_decimal"_w0"$west_degree"X"$west_decimal"_"$year"v"$version".tif" "deliverables/thredds/ncei"$cell_name"_n"$north_degree"X"$north_decimal"_w0"$west_degree"X"$west_decimal"_"$year"v"$version".nc" -fg -V
+#gmt grdconvert "deliverables/ncei"$cell_name"_n"$north_degree"x"$north_decimal"_w0"$west_degree"x"$west_decimal"_"$year"v"$version".tif" "deliverables/thredds/ncei"$cell_name"_n"$north_degree"x"$north_decimal"_w0"$west_degree"x"$west_decimal"_"$year"v"$version".nc" -fg -V
 
 echo "Removing Clipped tifs"
 sed 1d $name"_dem_list.txt" |
@@ -204,3 +212,27 @@ done
 # rm *.shx
 # rm *.dbf
 # rm *.prj
+echo "Computing Final Stats"
+rm -f minmax.csv
+echo "Creating inf files"
+datalists -i *.tif
+for i in *.inf; 
+do 
+	./minmax.py $i 
+done
+
+#moved below to create_dem.sh
+# echo "Identifying Potential Outliers"
+# for i in *.tif; 
+# do 
+# 	echo "DEM is" $i
+# 	rm -f thresholds.csv
+# 	echo "Calculating min and max thresholds from percentiles"
+# 	percentiles_minmax.py $i
+# 	min_threshold=`awk -F, '{print $2}' thresholds.csv`
+# 	max_threshold=`awk -F, '{print $3}' thresholds.csv`
+# 	echo "Creating outliers shapefiles"
+# 	outliers_shp.sh $i $min_threshold $max_threshold yes
+# 	echo 
+# done
+

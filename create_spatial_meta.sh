@@ -141,7 +141,7 @@ fi
 #extend=
 
 echo "Starting Spatial Metadata Generation"
-output_name="ncei"$cell_name"_n"$north_degree"X"$north_decimal"_w0"$west_degree"X"$west_decimal"_"$year"v"$version
+output_name="ncei"$cell_name"_n"$north_degree"x"$north_decimal"_w0"$west_degree"x"$west_decimal"_"$year"v"$version
 echo "Output name is:"$output_name
 echo "Command is: waffles -R $range -E $sm_res -V -O $output_name -M spat-meta -s $datalist -P 4269 -X $extend"
 

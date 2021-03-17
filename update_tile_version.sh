@@ -71,11 +71,10 @@ else
 	echo "New extension is" $new_extension
 
 	echo "Renaming tif to new version name" $input_tile_base"_"$new_extension".tif"
-	mv $input_tile $input_tile_base"_"$new_extension".tif"
+	mv "deliverables/"$input_tile "deliverables/"$input_tile_base"_"$new_extension".tif"
 
 	echo "Converting to NetCDF for thredds"
 	#below method causes half cell shift in global mapper but not in arcgis
 	#when converted to xyz, it appears in right place in global mapper
 	gmt grdconvert "deliverables/"$input_tile_base"_"$new_extension".tif" "deliverables/thredds/"$input_tile_base"_"$new_extension".nc" -fg -V
-
 fi

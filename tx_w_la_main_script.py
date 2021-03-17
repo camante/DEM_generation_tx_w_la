@@ -40,9 +40,9 @@ dc_lidar_process='no'
 tnm_lidar_process='no'
 ncei_dems_process='no'
 bathy_surf_process='no'
-dem_process='no'
+dem_process='yes'
 final_dem_format_process='no'
-spatial_meta_process='yes'
+spatial_meta_process='no'
 uncertainty_process='no'
 #################################################################
 #################################################################
@@ -82,7 +82,7 @@ name_cell_extents_dem_all=software_dir+'/gridding/tifs/smoothed/'+basename+'_nam
 dem_dlist=software_dir+'/gridding/'+basename+'_dem.datalist'
 dem_smooth_factor=5
 #use files listed in existing mb1 files at datalist
-dem_mb1_var='no'
+dem_mb1_var='yes'
 #
 #Spatial Metadata Datalist
 sm_dlist=manual_dir+'/software/gridding/'+basename+'_spatial_meta.datalist'
@@ -643,6 +643,16 @@ if dem_process=='yes':
 	#copy py script from DEM_generation code
 	os.system('cp {}/smooth_dem_bathy.py smooth_dem_bathy.py'.format(code_dir))
 
+	#delete py script if it exists
+	os.system('[ -e percentiles_minmax.py ] && rm percentiles_minmax.py')
+	#copy py script from DEM_generation code
+	os.system('cp {}/percentiles_minmax.py percentiles_minmax.py'.format(code_dir))
+
+	#delete shell script if it exists
+	os.system('[ -e outliers_shp.sh ] && rm outliers_shp.sh')
+	#copy shell script from DEM_generation code
+	os.system('cp {}/outliers_shp.sh outliers_shp.sh'.format(code_dir))
+
 	print "executing create_dem.sh script"
 	os.system('./create_dem.sh {} {} {} {}'.format(name_cell_extents_dem,dem_dlist,dem_smooth_factor,dem_mb1_var))
 	####
@@ -682,6 +692,11 @@ if final_dem_format_process=='yes':
 	os.system('[ -e average_tifs.py ] && rm average_tifs.py')
 	#copy py script from DEM_generation code
 	os.system('cp {}/average_tifs.py average_tifs.py'.format(code_dir))
+
+	#delete py script if it exists
+	os.system('[ -e minmax.py ] && rm minmax.py')
+	#copy py script from DEM_generation code
+	os.system('cp {}/minmax.py minmax.py'.format(code_dir))
 
 
 	print "executing create_dem.sh script"

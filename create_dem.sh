@@ -145,11 +145,23 @@ else
 	echo "cmd file didn't exist"
 fi
 
+
+echo "Identifying Potential Outliers"
+echo "DEM is" "tifs/"$name"_DEM.tif"
+rm -f thresholds.csv
+echo "Calculating min and max thresholds from percentiles"
+./percentiles_minmax.py "tifs/"$name"_DEM.tif"
+min_threshold=`awk -F, '{print $2}' thresholds.csv`
+max_threshold=`awk -F, '{print $3}' thresholds.csv`
+echo "Creating outliers shapefiles"
+./outliers_shp.sh "tifs/"$name"_DEM.tif" $min_threshold $max_threshold yes
+echo
+
+
 done
 
 else
 	help
 fi
-
 
 
