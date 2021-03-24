@@ -212,6 +212,8 @@ done
 # rm *.shx
 # rm *.dbf
 # rm *.prj
+
+cd deliverables
 echo "Computing Final Stats"
 rm -f minmax.csv
 echo "Creating inf files"

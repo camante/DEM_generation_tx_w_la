@@ -159,7 +159,9 @@ if [ ${#@} == 4 ];
 		ogr2ogr $name"_coast.shp" $coastline_full".shp" -clipsrc $x_min $y_min $x_max $y_max
 
 		echo -- Densifying Coastline Shapefile
-		ogr2ogr -f "ESRI Shapefile" -segmentize 0.000001 tmp.shp $name"_coast.shp"
+		#ogr2ogr -f "ESRI Shapefile" -segmentize 0.000001 tmp.shp $name"_coast.shp"
+		#less dense so that it doesn't crash
+		ogr2ogr -f "ESRI Shapefile" -segmentize 0.00001 tmp.shp $name"_coast.shp"
 		echo -- Converting to CSV
 		ogr2ogr -f CSV -dialect sqlite -sql "select AsGeoJSON(geometry) AS geom, * from tmp" tmp.csv tmp.shp
 		echo -- Formatting XYZ

@@ -33,16 +33,17 @@ import glob
 conv_grd_process='no'
 coast_process='no'
 usace_dredge_process='no'
+usace_dredge_process_reinterp='no'
 mb_process='no'
 nos_process='no'
 enc_process='no'
 dc_lidar_process='no'
 tnm_lidar_process='no'
 ncei_dems_process='no'
-bathy_surf_process='no'
+bathy_surf_process='yes'
 dem_process='yes'
+spatial_meta_process='yes'
 final_dem_format_process='no'
-spatial_meta_process='no'
 uncertainty_process='no'
 #################################################################
 #################################################################
@@ -72,7 +73,7 @@ bs_ind_dlist=data_dir+'/bathy/bathy_surf/xyz/bathy_surf.datalist'
 bs_tifs=data_dir+'/bathy/bathy_surf/tifs'
 coast_shp=data_dir+'/coast/'+basename+'_coast'
 #use files listed in existing mb1 files at datalist
-bs_mb1_var='no'
+bs_mb1_var='yes'
 #
 #DEM Gridding Variables
 manual_name_cell_extents_dem=manual_dir+'/software/gridding/'+basename+'_name_cell_extents_dem.csv'
@@ -82,7 +83,7 @@ name_cell_extents_dem_all=software_dir+'/gridding/tifs/smoothed/'+basename+'_nam
 dem_dlist=software_dir+'/gridding/'+basename+'_dem.datalist'
 dem_smooth_factor=5
 #use files listed in existing mb1 files at datalist
-dem_mb1_var='yes'
+dem_mb1_var='no'
 #
 #Spatial Metadata Datalist
 sm_dlist=manual_dir+'/software/gridding/'+basename+'_spatial_meta.datalist'
@@ -158,7 +159,7 @@ for i in data_dir_list:
 		os.makedirs(i)
 
 #Creating main bathy data subdirectories
-bathy_dir_list=[data_dir+'/bathy/usace_dredge', data_dir+'/bathy/mb', data_dir+'/bathy/nos', data_dir+'/bathy/enc', data_dir+'/bathy/bathy_surf']
+bathy_dir_list=[data_dir+'/bathy/usace_dredge',data_dir+'/bathy/usace_dredge_reinterp', data_dir+'/bathy/mb', data_dir+'/bathy/nos', data_dir+'/bathy/enc', data_dir+'/bathy/bathy_surf']
 for i in bathy_dir_list:
 	if not os.path.exists(i):
 		print 'creating subdir', i
@@ -355,6 +356,64 @@ if usace_dredge_process=='yes':
 	os.system('./usace_dredge_processing.py {} {} {} {} {}'.format(study_area_shp, conv_grd_path, bs_dlist, dem_dlist, lastools_dir))
 else:
 	print "Skipping USACE Dredge Processing"
+
+
+####### REINTERP New Surveys with parameter to better create shp
+if usace_dredge_process_reinterp=='yes':
+	os.system('cd')
+	os.chdir(data_dir+'/bathy/usace_dredge_reinterp')
+	print 'Current Directory is', os.getcwd()
+	
+	####### CODE MANAGEMENT #########
+	os.system('mkdir -p zip')
+	os.system('mkdir -p gdb')
+	os.system('mkdir -p csv')
+	os.system('mkdir -p xyz')
+	os.system('mkdir -p xyz/navd88')
+	os.system('mkdir -p xyz/navd88/interp')
+
+	#delete python script if it exists
+	os.system('[ -e usace_dredge_processing_reinterp.py ] && rm usace_dredge_processing_reinterp.py')
+	#copy python script from DEM_generation code
+	os.system('cp {}/usace_dredge_processing_reinterp.py usace_dredge_processing_reinterp.py'.format(code_dir)) 
+
+	#delete shell script if it exists
+	os.system('[ -e csv/usace_ft2m.sh ] && rm csv/usace_ft2m.sh')
+	#copy sh script from DEM_generation code
+	os.system('cp {}/usace_ft2m.sh csv/usace_ft2m.sh'.format(code_dir)) 
+
+	#delete shell script if it exists
+	os.system('[ -e xyz/vert_conv.sh ] && rm xyz/vert_conv.sh')
+	#copy sh script from DEM_generation code
+	os.system('cp {}/vert_conv.sh xyz/vert_conv.sh'.format(code_dir)) 
+
+	#delete shell script if it exists
+	os.system('[ -e xyz/gdal_query.py ] && rm xyz/gdal_query.py')
+	#copy sh script from DEM_generation code
+	os.system('cp {}/gdal_query.py xyz/gdal_query.py'.format(code_dir)) 
+
+	#delete shell script if it exists
+	os.system('[ -e xyz/navd88/create_datalist.sh ] && rm xyz/navd88/create_datalist.sh')
+	#copy sh script from DEM_generation code
+	os.system('cp {}/create_datalist.sh xyz/navd88/create_datalist.sh'.format(code_dir))
+
+	#delete shell script if it exists
+	os.system('[ -e xyz/navd88/usace_interp_reinterp.sh ] && rm xyz/navd88/usace_interp_reinterp.sh')
+	#copy sh script from DEM_generation code
+	os.system('cp {}/usace_interp_reinterp.sh xyz/navd88/usace_interp_reinterp.sh'.format(code_dir))
+
+	#delete shell script if it exists
+	os.system('[ -e xyz/navd88/interp/create_datalist.sh ] && rm xyz/navd88/interp/create_datalist.sh')
+	#copy sh script from DEM_generation code
+	os.system('cp {}/create_datalist.sh xyz/navd88/interp/create_datalist.sh'.format(code_dir)) 
+
+	print "executing usace_dredge_processing script"
+	os.system('./usace_dredge_processing_reinterp.py {} {} {} {} {}'.format(study_area_shp, conv_grd_path, bs_dlist, dem_dlist, lastools_dir))
+else:
+	print "Skipping USACE Dredge Processing REINTERP"
+
+
+
 ######################### Multibeam #############################
 if mb_process=='yes':
 	os.system('cd')
@@ -647,6 +706,11 @@ if dem_process=='yes':
 	os.system('[ -e percentiles_minmax.py ] && rm percentiles_minmax.py')
 	#copy py script from DEM_generation code
 	os.system('cp {}/percentiles_minmax.py percentiles_minmax.py'.format(code_dir))
+
+	#delete py script if it exists
+	os.system('[ -e minmax.py ] && rm minmax.py')
+	#copy py script from DEM_generation code
+	os.system('cp {}/minmax.py minmax.py'.format(code_dir))
 
 	#delete shell script if it exists
 	os.system('[ -e outliers_shp.sh ] && rm outliers_shp.sh')
