@@ -40,9 +40,10 @@ enc_process='no'
 dc_lidar_process='no'
 tnm_lidar_process='no'
 ncei_dems_process='no'
-bathy_surf_process='yes'
-dem_process='yes'
-spatial_meta_process='yes'
+topo_guide_process='yes'
+bathy_surf_process='no'
+dem_process='no'
+spatial_meta_process='no'
 final_dem_format_process='no'
 uncertainty_process='no'
 #################################################################
@@ -73,7 +74,7 @@ bs_ind_dlist=data_dir+'/bathy/bathy_surf/xyz/bathy_surf.datalist'
 bs_tifs=data_dir+'/bathy/bathy_surf/tifs'
 coast_shp=data_dir+'/coast/'+basename+'_coast'
 #use files listed in existing mb1 files at datalist
-bs_mb1_var='yes'
+bs_mb1_var='no'
 #
 #DEM Gridding Variables
 manual_name_cell_extents_dem=manual_dir+'/software/gridding/'+basename+'_name_cell_extents_dem.csv'
@@ -652,6 +653,32 @@ if ncei_dems_process=='yes':
 	####
 else:
 	print "Skipping NCEI DEM Processing"
+
+
+###################################################################
+###################################################################
+###################################################################
+######################### TOPO GUIDE BATHY SURFACE ###########################
+###################################################################
+###################################################################
+###################################################################
+if topo_guide_process=='yes':
+	os.system('cd')
+	os.chdir(data_dir+'/bathy/bathy_surf')
+	print 'Current Directory is', os.getcwd()
+	
+	######### CODE MANAGEMENT #########
+
+	#delete shell script if it exists
+	os.system('[ -e create_topo_guide.sh ] && rm create_topo_guide.sh')
+	#copy shell script from DEM_generation code
+	os.system('cp {}/create_topo_guide.sh create_topo_guide.sh'.format(code_dir))
+
+	print "executing create_topo_guide.sh script"
+	os.system('./create_topo_guide.sh {} {}'.format(name_cell_extents_bs,coast_shp))
+	####
+else:
+	print "Skipping Bathy Surface Processing"
 
 ###################################################################
 ###################################################################

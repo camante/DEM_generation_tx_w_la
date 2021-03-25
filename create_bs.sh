@@ -169,9 +169,9 @@ if [ ${#@} == 4 ];
 		#sed 's/],/\n/g' tmp.csv | sed 's|[[]||g' | sed 's|[]]||g' | sed 's/}","0"//g' | sed 's/geom,DN//g' | sed 's/"{""type"":""Polygon"",""coordinates""://g' | sed '/^$/d' | sed 's/$/,-0.1/' > topo_guide/$name"_tguide.xyz"
 		#after editing coastline shp, above no longer worked.
 		#editted below to work with edited coastline shp
-		sed 's/],/\n/g' tmp.csv | sed 's|[[]||g' | sed 's|[]]||g' | sed 's/}","0"//g' | sed 's/geom,DN//g' | sed 's/"{""type"":""Polygon"",""coordinates""://g' | sed '/^$/d' | sed 's/$/,-0.1/' | awk -F, '{print $1,$2,$4}' | awk '{if (NR!=1) {print}}' > topo_guide/$name"_tguide.xyz"
-		
-
+		#sed 's/],/\n/g' tmp.csv | sed 's|[[]||g' | sed 's|[]]||g' | sed 's/}","0"//g' | sed 's/geom,DN//g' | sed 's/"{""type"":""Polygon"",""coordinates""://g' | sed '/^$/d' | sed 's/$/,-0.1/' | awk -F, '{print $1,$2,$4}' | awk '{if (NR!=1) {print}}' > topo_guide/$name"_tguide.xyz"
+		#editted again below to work with edited coastline shp
+		sed 's/],/\n/g' tmp.csv | sed 's|[[]||g' | sed 's|[]]||g' | sed 's/}","0"//g' | sed 's/geom,DN//g' | sed 's/"{""type"":""Polygon"",""coordinates""://g' | sed '/^$/d' | sed 's/$/,-0.1/' | awk 'NR > 2 { print }' | sed '$d' > topo_guide/$name"_tguide.xyz"
 		rm tmp.shp
 		rm tmp.dbf
 		rm tmp.prj
