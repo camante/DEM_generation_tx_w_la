@@ -17,11 +17,15 @@ then
 
 mkdir -p tif
 mkdir -p xyz
+mkdir -p ellip
 
 chunk_dim_x_int=$1
 chunk_dim_y_int=$1
 resamp_input=$2
 resamp_res=$3
+
+echo "Moving all ellipsoid files to separate folder"
+mv *Ellipsoid* ellip/
 
 echo unzipping files
 for i in *.gz;

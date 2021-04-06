@@ -31,6 +31,7 @@ conv_grd_path=sys.argv[2]
 bs_dlist=sys.argv[3]
 dem_dlist=sys.argv[4]
 lastools_dir=sys.argv[5]
+coast_shp=sys.argv[6]
 
 print conv_grd_path
 
@@ -140,8 +141,10 @@ os.system(usace_datalist_cmd)
 #os.system(add_to_master_cmd)
 
 print "Creating Interpolated Points between Surveys" 
-#number of cell of interpolation
-usace_interp_reinterp_cmd='./usace_interp_reinterp.sh ' + lastools_dir + ' 0.00009259259 10 0.00003086420'
+#./usace_interp_reinterp.sh /media/sf_C_win_lx/software/LAStools/bin 0.015 0.00009259259 0.00003086420 20 5
+#./usace_interp_reinterp.sh /media/sf_C_win_lx/software/LAStools/bin 0.015 0.00009259259 0.00003086420 20 5 tx_w_la_coast
+#'./usace_interp_reinterp.sh ' + lastools_dir + ' 0.015 0.00009259259 0.00003086420 20 5 ' + coast_shp
+usace_interp_reinterp_cmd='./usace_interp_reinterp.sh ' + lastools_dir + ' 0.015 0.00009259259 0.00003086420 ' + coast_shp
 os.system(usace_interp_reinterp_cmd)
 
 print "Creating datalist"

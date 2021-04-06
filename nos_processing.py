@@ -38,7 +38,7 @@ resamp_res=0.000030864199
 
 print "Current directory is ", os.getcwd()
 print 'Downloading NOS / BAG Surveys'
-nos_download_cmd='''fetches -R {} nos'''.format(study_area_shp)
+nos_download_cmd='''fetches -R {} nos -u'''.format(study_area_shp)
 print nos_download_cmd
 os.system(nos_download_cmd)
 
@@ -104,5 +104,5 @@ current_dir=os.getcwd()
 add_to_bmaster_cmd='echo ' + current_dir + '/nos_bag.datalist -1 10 >> ' + bs_dlist
 os.system(add_to_bmaster_cmd)
 
-add_to_master_cmd='echo ' + current_dir + '/nos_bag.datalist -1 1 >> ' + dem_dlist
+add_to_master_cmd='echo ' + current_dir + '/nos_bag.datalist -1 10 >> ' + dem_dlist
 os.system(add_to_master_cmd)

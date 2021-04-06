@@ -31,17 +31,19 @@ conv_grd_path=sys.argv[2]
 bs_dlist=sys.argv[3]
 dem_dlist=sys.argv[4]
 lastools_dir=sys.argv[5]
+coast_shp=sys.argv[6]
 
-print conv_grd_path
+# print conv_grd_path
 
-print "Current directory is ", os.getcwd()
-print 'Downloading USACE Channel Surveys'
-usace_download_cmd='''fetches -R {} usace'''.format(study_area_shp)
-os.system(usace_download_cmd)
+# print "Current directory is ", os.getcwd()
+# print 'Downloading USACE Channel Surveys'
+# usace_download_cmd='''fetches -R {} usace -u'''.format(study_area_shp)
+# print "Command is", usace_download_cmd
+# os.system(usace_download_cmd)
 
-print "moving zip files to directory"
-move_zip_cmd="find . -name '*.ZIP' -exec mv {} zip/ \; 2>/dev/null"
-os.system(move_zip_cmd)
+# print "moving zip files to directory"
+# move_zip_cmd="find . -name '*.ZIP' -exec mv {} zip/ \; 2>/dev/null"
+# os.system(move_zip_cmd)
 
 print "unzipping all zip files"
 os.chdir('zip')
@@ -103,8 +105,8 @@ print "moving csv files to directory"
 move_csv_cmd="find . -name '*_nad83_mllw.csv' -exec mv {} csv/ \; 2>/dev/null"
 os.system(move_csv_cmd)
 
-print "Deleting zips and gdb directories"
-os.system('''rm -rf zip''')
+print "Deleting gdb directories"
+#os.system('''rm -rf zip''')
 os.system('''rm -rf gdb''')
 
 #most survey are in feet, positive down. But a few are negative.
@@ -129,15 +131,22 @@ os.chdir('navd88')
 usace_datalist_cmd='./create_datalist.sh usace_dredge'
 os.system(usace_datalist_cmd)
 
-current_dir=os.getcwd()
-add_to_bmaster_cmd='echo ' + current_dir + '/usace_dredge.datalist -1 10 >> ' + bs_dlist
-os.system(add_to_bmaster_cmd)
+#print "Copying xyzs and infs to original USACE directory"
+#just manually do this for now
 
-add_to_master_cmd='echo ' + current_dir + '/usace_dredge.datalist -1 10 >> ' + dem_dlist
-os.system(add_to_master_cmd)
+#current_dir=os.getcwd()
+#add_to_bmaster_cmd='echo ' + current_dir + '/usace_dredge.datalist -1 10 >> ' + bs_dlist
+#os.system(add_to_bmaster_cmd)
 
-print "Creating Interpolated Points between Surveys"
-usace_interp_cmd='./usace_interp.sh ' + lastools_dir + ' 0.00009259259 10 0.00003086420'
+#add_to_master_cmd='echo ' + current_dir + '/usace_dredge.datalist -1 10 >> ' + dem_dlist
+#os.system(add_to_master_cmd)
+
+print "Creating Interpolated Points between Surveys" 
+#./usace_interp.sh /media/sf_C_win_lx/software/LAStools/bin 0.015 0.00009259259 0.00003086420 20 5
+#./usace_interp.sh /media/sf_C_win_lx/software/LAStools/bin 0.015 0.00009259259 0.00003086420 20 5 tx_w_la_coast
+#./usace_interp.sh /media/sf_C_win_lx/software/LAStools/bin 0.015 0.00009259259 0.00003086420 20 5 /media/sf_F_win_lx/COASTAL_Act/camante/tx_w_la/data/coast/tx_w_la_coast
+#./usace_interp.sh /media/sf_C_win_lx/software/LAStools/bin 0.015 0.00009259259 0.00003086420 /media/sf_F_win_lx/COASTAL_Act/camante/tx_w_la/data/coast/tx_w_la_coast
+usace_interp_cmd='./usace_interp.sh ' + lastools_dir + ' 0.015 0.00009259259 0.00003086420 ' + coast_shp
 os.system(usace_interp_cmd)
 
 print "Creating datalist"
@@ -145,9 +154,9 @@ os.chdir('interp')
 usace_interp_datalist_cmd='./create_datalist.sh usace_dredge_interp'
 os.system(usace_interp_datalist_cmd)
 
-current_dir=os.getcwd()
-add_to_bmaster_cmd2='echo ' + current_dir + '/usace_dredge_interp.datalist -1 1 >> ' + bs_dlist
-os.system(add_to_bmaster_cmd2)
+#current_dir=os.getcwd()
+#add_to_bmaster_cmd2='echo ' + current_dir + '/usace_dredge_interp.datalist -1 1 >> ' + bs_dlist
+#os.system(add_to_bmaster_cmd2)
 
-add_to_master_cmd2='echo ' + current_dir + '/usace_dredge_interp.datalist -1 0.1 >> ' + dem_dlist
-os.system(add_to_master_cmd2)
+#add_to_master_cmd2='echo ' + current_dir + '/usace_dredge_interp.datalist -1 0.1 >> ' + dem_dlist
+#os.system(add_to_master_cmd2)
