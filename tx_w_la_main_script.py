@@ -41,10 +41,10 @@ dc_lidar_process='no'
 tnm_lidar_process='no'
 ncei_dems_process='no'
 topo_guide_process='no'
-bathy_surf_process='no'
-dem_process='no'
+bathy_surf_process='yes'
+dem_process='yes'
 spatial_meta_process='yes'
-final_dem_format_process='no'
+final_dem_format_process='yes'
 uncertainty_process='no'
 #################################################################
 #################################################################
@@ -752,6 +752,37 @@ else:
 ####################################################################
 ####################################################################
 ####################################################################
+########################## SPATIAL METADATA ########################
+####################################################################
+####################################################################
+####################################################################
+if spatial_meta_process=='yes':
+	os.system('cd')
+	os.chdir(software_dir+'/gridding/tifs/smoothed/deliverables/spatial_meta')
+	print 'Current Directory is', os.getcwd()
+	
+	######### CODE MANAGEMENT #########
+	#delete shell script if it exists
+	os.system('[ -e create_spatial_meta.sh ] && rm create_spatial_meta.sh')
+	#copy shell script from DEM_generation code
+	os.system('cp {}/create_spatial_meta.sh create_spatial_meta.sh'.format(code_dir))
+
+	#delete shell script if it exists
+	os.system('[ -e update_tile_version_sm.sh ] && rm update_tile_version_sm.sh')
+	#copy shell script from DEM_generation code
+	os.system('cp {}/update_tile_version_sm.sh update_tile_version_sm.sh'.format(code_dir))
+
+	print "executing create_spatial_meta.sh script"
+	os.system('./create_spatial_meta.sh {} {} {} {} {}'.format(name_cell_extents_sm,sm_dlist,sm_res,year,version))
+	####
+
+else:
+	print "Skipping Spatial Metadata Generation"
+
+
+####################################################################
+####################################################################
+####################################################################
 ########################## FINAL DEM FORMATTING ####################
 ####################################################################
 ####################################################################
@@ -784,44 +815,12 @@ if final_dem_format_process=='yes':
 	os.system('cp {}/average_tifs.py average_tifs.py'.format(code_dir))
 
 	#delete py script if it exists
-	os.system('[ -e minmax.py ] && rm minmax.py')
+	os.system('[ -e /deliverables/minmax.py ] && rm /deliverables/minmax.py')
 	#copy py script from DEM_generation code
-	os.system('cp {}/minmax.py minmax.py'.format(code_dir))
+	os.system('cp {}/minmax.py {}/gridding/tifs/smoothed/deliverables/minmax.py'.format(code_dir,software_dir))
 
-
-	print "executing create_dem.sh script"
+	print "executing final_dem_format.sh script"
 	os.system('./final_dem_format.sh {} {} {} {} {}'.format(name_cell_extents_dem_all,dem_smooth_factor,year,version,ncei_border_dems_path))
 	####
 else:
 	print "Skipping DEM Formatting Processing"
-
-####################################################################
-####################################################################
-####################################################################
-########################## SPATIAL METADATA ########################
-####################################################################
-####################################################################
-####################################################################
-if spatial_meta_process=='yes':
-	os.system('cd')
-	os.chdir(software_dir+'/gridding/tifs/smoothed/deliverables/spatial_meta')
-	print 'Current Directory is', os.getcwd()
-	
-	######### CODE MANAGEMENT #########
-	#delete shell script if it exists
-	os.system('[ -e create_spatial_meta.sh ] && rm create_spatial_meta.sh')
-	#copy shell script from DEM_generation code
-	os.system('cp {}/create_spatial_meta.sh create_spatial_meta.sh'.format(code_dir))
-
-	#delete shell script if it exists
-	os.system('[ -e update_tile_version_sm.sh ] && rm update_tile_version_sm.sh')
-	#copy shell script from DEM_generation code
-	os.system('cp {}/update_tile_version_sm.sh update_tile_version_sm.sh'.format(code_dir))
-
-	print "executing create_spatial_meta.sh script"
-	os.system('./create_spatial_meta.sh {} {} {} {} {}'.format(name_cell_extents_sm,sm_dlist,sm_res,year,version))
-	####
-
-else:
-	print "Skipping Spatial Metadata Generation"
-

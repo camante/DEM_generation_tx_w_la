@@ -217,7 +217,7 @@ cd deliverables
 echo "Computing Final Stats"
 rm -f minmax.csv
 echo "Creating inf files"
-datalists -i *.tif
+datalists *.tif -r
 for i in *.inf; 
 do 
 	./minmax.py $i 

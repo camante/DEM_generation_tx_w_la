@@ -55,7 +55,7 @@ do
 	then
 		echo -- Resampling to target resolution
 		#exit 1
-		gdalwarp $i -dstnodata -999999 -r cubicspline -tr $resamp_res $resamp_res -t_srs EPSG:4269 $(basename $i .tif)"_resamp.tif" -overwrite
+		gdalwarp $i -dstnodata -999999 -r bilinear -tr $resamp_res $resamp_res -t_srs EPSG:4269 $(basename $i .tif)"_resamp.tif" -overwrite
 		input_file=$(basename $i .tif)"_resamp.tif"
 		echo input_file is $input_file
 	else

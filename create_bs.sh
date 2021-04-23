@@ -210,7 +210,7 @@ if [ ${#@} == 4 ];
 	mbgrid -I$datalist -O$dem_name \
 	$mb_range \
 	-A2 -D$x_dim_int/$y_dim_int -G3 -N \
-	-C810000000/3 -S0 -F1 -T0.25 -X0.1
+	-C810000000/3 -S0 -F1 -T0.25 -X0.25
 
 	#Check to see if any valid data
 	z_min=`gmt grdinfo $grid_dem | grep -e "z_min" | awk '{print $3}'`
@@ -253,8 +253,12 @@ if [ ${#@} == 4 ];
 
 				#subset image
 				[ -e $grid_dem"_rc_tr_tmp2.tif" ] && rm $grid_dem"_rc_tr_tmp2.tif"
-				gdal_translate $grid_dem"_rc_tr_tmp.tif" -srcwin $ninth_clip_factor $ninth_clip_factor $x_dim_int_grdsamp $y_dim_int_grdsamp -a_srs EPSG:4269 -a_nodata -9999 -co "COMPRESS=DEFLATE" -co "PREDICTOR=3" -co "TILED=YES" $grid_dem"_rc_tr.tif"
+				gdal_translate $grid_dem"_rc_tr_tmp.tif" -srcwin $ninth_clip_factor $ninth_clip_factor $x_dim_int_grdsamp $y_dim_int_grdsamp -a_srs EPSG:4269 -a_nodata -9999 -co "COMPRESS=DEFLATE" -co "PREDICTOR=3" -co "TILED=YES" $grid_dem"_rc_tr_tmp2.tif"
 				rm $grid_dem"_rc_tr_tmp.tif"
+
+				echo -- Changing any 0 or above to -0.1m
+				gdal_calc.py -A $grid_dem"_rc_tr_tmp2.tif" --outfile=$grid_dem"_rc_tr.tif" --calc="-0.1*(A >= 0.0)+A*(A < 0.0)" --format=GTiff --overwrite
+				rm $grid_dem"_rc_tr_tmp2.tif"
 
 			else
 				echo "Resampling to 1/3rd Resolution"
@@ -265,9 +269,13 @@ if [ ${#@} == 4 ];
 
 				#subset image
 				[ -e $grid_dem"_rc_tr_tmp2.tif" ] && rm $grid_dem"_rc_tr_tmp2.tif"
-				gdal_translate $grid_dem"_rc_tr_tmp.tif" -srcwin $third_clip_factor $third_clip_factor $x_dim_int_grdsamp $y_dim_int_grdsamp -a_srs EPSG:4269 -a_nodata -9999 -co "COMPRESS=DEFLATE" -co "PREDICTOR=3" -co "TILED=YES" $grid_dem"_rc_tr.tif"
+				gdal_translate $grid_dem"_rc_tr_tmp.tif" -srcwin $third_clip_factor $third_clip_factor $x_dim_int_grdsamp $y_dim_int_grdsamp -a_srs EPSG:4269 -a_nodata -9999 -co "COMPRESS=DEFLATE" -co "PREDICTOR=3" -co "TILED=YES" $grid_dem"_rc_tr_tmp2.tif"
 				rm $grid_dem"_rc_tr_tmp.tif"
-				
+
+				echo -- Changing any 0 or above to -0.1m
+				gdal_calc.py -A $grid_dem"_rc_tr_tmp2.tif" --outfile=$grid_dem"_rc_tr.tif" --calc="-0.1*(A >= 0.0)+A*(A < 0.0)" --format=GTiff --overwrite
+				rm $grid_dem"_rc_tr_tmp2.tif"
+
 			fi
 
 			#Create Shp for both 1/3rd and 1/9th
@@ -364,6 +372,13 @@ if [ ${#@} == 4 ];
 			tile_name="1"
 			#remove file extension to get basename from input file
 			input_name=${input_file::-4}
+
+			#remove existing bathy surf xyzs bc coastline may have changed
+			cd xyz
+			rm *$input_name*.xyz
+			rm *$input_name*.xyz.inf
+			cd ..
+
 			#starting point for tiling
 			xoff=0
 			yoff=0

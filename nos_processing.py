@@ -37,50 +37,50 @@ resamp_res=0.000030864199
 
 
 print "Current directory is ", os.getcwd()
-print 'Downloading NOS / BAG Surveys'
-nos_download_cmd='''fetches -R {} nos -u'''.format(study_area_shp)
-print nos_download_cmd
-os.system(nos_download_cmd)
+# print 'Downloading NOS / BAG Surveys'
+# nos_download_cmd='''fetches -R {} nos -u'''.format(study_area_shp)
+# print nos_download_cmd
+# os.system(nos_download_cmd)
 
-print "Separating NOS and BAG Surveys"
-move_xyz_gz_cmd="find . -name '*.xyz.gz' -exec mv {} nos_hydro/ \; 2>/dev/null"
-os.system(move_xyz_gz_cmd)
+# print "Separating NOS and BAG Surveys"
+# move_xyz_gz_cmd="find . -name '*.xyz.gz' -exec mv {} nos_hydro/ \; 2>/dev/null"
+# os.system(move_xyz_gz_cmd)
 
-move_bag_cmd="find . -name '*.bag*' -exec mv {} nos_bag/ \; 2>/dev/null"
-os.system(move_bag_cmd)
+# move_bag_cmd="find . -name '*.bag*' -exec mv {} nos_bag/ \; 2>/dev/null"
+# os.system(move_bag_cmd)
 
-move_bag_gz_cmd="find . -name '*.bag.gz' -exec mv {} nos_bag/ \; 2>/dev/null"
-os.system(move_bag_gz_cmd)
+# move_bag_gz_cmd="find . -name '*.bag.gz' -exec mv {} nos_bag/ \; 2>/dev/null"
+# os.system(move_bag_gz_cmd)
 
-print "Unzipping NOS"
-os.chdir('nos_hydro')
-os.system('gunzip *.xyz.gz')
+# print "Unzipping NOS"
+# os.chdir('nos_hydro')
+# os.system('gunzip *.xyz.gz')
 
-print "Moving all xyz files to xyz directory"
-move_xyz_cmd="find . -name '*.xyz' -exec mv {} xyz/ \; 2>/dev/null"
-os.system(move_xyz_cmd)
+# print "Moving all xyz files to xyz directory"
+# move_xyz_cmd="find . -name '*.xyz' -exec mv {} xyz/ \; 2>/dev/null"
+# os.system(move_xyz_cmd)
 
-print "Converting NOS to X,Y,Negative Z"
-os.chdir('xyz')
-neg_z_cmd=('./nos2xyz.sh')
-os.system(neg_z_cmd)
+# print "Converting NOS to X,Y,Negative Z"
+# os.chdir('xyz')
+# neg_z_cmd=('./nos2xyz.sh')
+# os.system(neg_z_cmd)
 
-print "Converting NOS to NAVD88"
-os.chdir('neg_m')
-nos2navd88_cmd="./vert_conv.sh " + conv_grd_path + "  navd88"
-os.system(nos2navd88_cmd)
+# print "Converting NOS to NAVD88"
+# os.chdir('neg_m')
+# nos2navd88_cmd="./vert_conv.sh " + conv_grd_path + "  navd88"
+# os.system(nos2navd88_cmd)
 
-print "Creating NOS Datalist"
-os.chdir('navd88')
-nos_datalist_cmd='./create_datalist.sh nos_hydro'
-os.system(nos_datalist_cmd)
+# print "Creating NOS Datalist"
+# os.chdir('navd88')
+# nos_datalist_cmd='./create_datalist.sh nos_hydro'
+# os.system(nos_datalist_cmd)
 
-current_dir=os.getcwd()
-add_to_bmaster_cmd='echo ' + current_dir + '/nos_hydro.datalist -1 1 >> ' + bs_dlist
-os.system(add_to_bmaster_cmd)
+# current_dir=os.getcwd()
+# add_to_bmaster_cmd='echo ' + current_dir + '/nos_hydro.datalist -1 1 >> ' + bs_dlist
+# os.system(add_to_bmaster_cmd)
 
 
-os.chdir('../../../..')
+# os.chdir('../../../..')
 
 
 os.chdir('nos_bag')
@@ -100,9 +100,9 @@ os.chdir('navd88')
 bag_datalist_cmd='./create_datalist.sh nos_bag'
 os.system(bag_datalist_cmd)
 
-current_dir=os.getcwd()
-add_to_bmaster_cmd='echo ' + current_dir + '/nos_bag.datalist -1 10 >> ' + bs_dlist
-os.system(add_to_bmaster_cmd)
+# current_dir=os.getcwd()
+# add_to_bmaster_cmd='echo ' + current_dir + '/nos_bag.datalist -1 10 >> ' + bs_dlist
+# os.system(add_to_bmaster_cmd)
 
-add_to_master_cmd='echo ' + current_dir + '/nos_bag.datalist -1 10 >> ' + dem_dlist
-os.system(add_to_master_cmd)
+# add_to_master_cmd='echo ' + current_dir + '/nos_bag.datalist -1 10 >> ' + dem_dlist
+# os.system(add_to_master_cmd)

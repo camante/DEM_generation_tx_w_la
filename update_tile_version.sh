@@ -1,6 +1,7 @@
 input_tile=$1
 year=$2
 existing_tiles=all_dc_tiles.csv
+[ -e replace_files.csv ] && rm replace_files.csv
 touch replace_files.csv
 
 #create all_dc_tiles.csv if it doesn't already exist

@@ -78,7 +78,7 @@ then
 		gdal_fillnodata.py -md $nodata_fill $(basename $i .xyz).tif $(basename $i .xyz)_fill.tif
 		
 		echo "Resampling to target resolution"
-		gdalwarp $(basename $i .xyz)_fill.tif -r cubicspline -tr $final_cellsize $final_cellsize‬ $(basename $i .xyz)_fill_resamp.tif
+		gdalwarp $(basename $i .xyz)_fill.tif -r bilinear -tr $final_cellsize $final_cellsize‬ $(basename $i .xyz)_fill_resamp.tif
 
 		echo "Clipping to Survey Polygon"
 		gdal_rasterize -i -burn nan -l $(basename $i .xyz) $(basename $i .xyz).shp $(basename $i .xyz)_fill_resamp.tif 
